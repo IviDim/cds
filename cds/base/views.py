@@ -19,7 +19,8 @@
 
 """CDS Demosite interface."""
 
-from flask import Blueprint
+
+from flask import Blueprint, current_app
 
 blueprint = Blueprint('cds', __name__, url_prefix='/',
                       template_folder='templates', static_folder='static')

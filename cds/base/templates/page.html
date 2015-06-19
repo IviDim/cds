@@ -18,7 +18,10 @@
 #}
 
 {%- extends "page_base.html" -%}
-
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "test.js" %}
+{% endblock %}
 
 {%- block page_header -%}
   <div id="wrap"> {# get closed into page_footer #}

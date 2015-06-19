@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {#
 # This file is part of Invenio.
 # Copyright (C) 2012, 2013, 2014, 2015 CERN.
@@ -20,11 +21,257 @@
 {% macro get_author(author, is_link=false) %}
     {% if is_link %}
       <a href="http://cds.cern.ch/search?f=author&p={{ author.full_name }}&ln=en">
+=======
+{# ----------------Ivi's macros---------------------- #}
+
+{% bundles "test.js" %}
+
+{% macro get_num_of_files(record) %}
+  {% if record['files'] %}
+     <i class="fa fa-file"></i> 
+    {% if record['files'][0] %}              
+      {% set x = record['files']|length %}
+      {% if x == 1 %}
+        {{ '1 file' }}
+      {% else %}
+        {{ x }}
+        {{ 'files' }}
+      {% endif %}   
+    {% else %}
+      {{ '1 file' }}
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+{% macro get_collections(record) %}
+  {% if record['collections'] %}
+    {% if record['collections'][0] %}
+    {# If there is a list of collections #}
+      {% for col in record['collections'] %}
+        <a href="http://cds.cern.ch/collection/{{ col['primary'] }}">
+        {{ col['primary'] }}</a>
+      {% endfor %}
+    {% else %}
+    {# If there isn't a list of collections #}
+      <a href="http://cds.cern.ch/collection/{{ record['collections']['primary'] }}">
+        {{ record['collections']['primary'] }}</a>
+      
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+
+
+{% macro get_thumbnail(record) %}
+	{% if record['files'] %}
+		{% if record['files'] != [] %}
+			{% if record['files'][0] %}
+     		{# If there are several external links #}
+     			{% set c = 0 %}
+				{% for f in record['files'] %}
+				   	{% if (f['eformat'] == '.jpg') or (f['eformat'] == '.png') or (f['eformat'] == '.gif') or (f['eformat'] == '.bmp') %}
+				    	{% set c=c+1 %}
+				    	{% if c == 1 %}
+				    		<a href={{f['url']}} class="thumbnail">
+								<img src={{f['url']}} alt={{f['full_name']}} >
+							</a>
+				    	{% endif %}
+				    {% endif %}
+				{% endfor %}
+			{% else %}
+			{# If there is only one external link #}
+				{% if (record['files']['eformat'] == '.jpg') or (f['eformat'] == '.png') or (f['eformat'] == '.gif') or (f['eformat'] == '.bmp') %}
+				<a href={{record['files']['url']}} class="thumbnail">
+					<img src={{record['files']['url']}} alt={{record['files']['full_name']}}>
+				</a>	
+				{% endif %}	
+     		{% endif %}
+		{% endif %}
+	{% endif %}
+{% endmacro %}
+
+{% macro dokimi(record) %}
+{% endmacro %}
+
+
+{% macro get_files(record) %}
+  {% if record['files'] %}
+  {# If there are files #}
+  	{% if record['files'] != [] %}
+	    {%  if record['files'][0] %}
+	    {# If there are several files #}
+	      {% for f in record['files']%}
+	      	<i class="glyphicon glyphicon-file"></i>
+	      	<a id="a1" href={{f['url']}}>
+	        {{f['full_name']}}</a>
+          <small>{{'('}}
+          {{f['size']/1000}}
+          {{' KB)'}}</small>
+	        <br>  
+	      {% endfor %}
+	    {% else %}
+	    	<i class="glyphicon glyphicon-file"></i>
+	      	<a id="a1" href={{record['files']['url']}}>
+	        {{record['files']['full_name']}}</a>
+          <small>{{'('}}
+          {{record['files']['size']/1000}}
+          {{' KB)'}}</small>
+	      	<br>
+	    {% endif %}
+	 {% endif %}
+  {% endif %}
+{% endmacro %}
+
+
+{% macro get_external(record) %}
+  {% if record['url'] %}  
+   {# If there are external links #}
+    <b>{{ 'External links:' }}</b>
+    <br>
+    {% if record['url'][0] %}
+     {# If there are several external links #}
+      {% for u in record['url']%}
+        <i class="glyphicon glyphicon-link"></i>
+        <a href={{u['url']}}>
+        {{u['description']}}</a>
+        <br>
+      {% endfor %}
+    {% else %}
+     {# If there is only one external link #}
+      <i class="glyphicon glyphicon-link"></i>
+      <a href={{record['url']['url']}}>{{record['url']['description']}}</a>
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+
+{% macro get_primary(record) %}
+  {% if record['primary_report_number'] %}
+    <i class="glyphicon glyphicon-qrcode"></i>
+    {{ record['primary_report_number'] }}
+  {% endif %}
+{% endmacro %}
+
+{% macro get_recid(record) %}
+  {{ record['recid'] }}
+{% endmacro %}
+ 
+
+{% macro get_title(record) %}
+    {% if record.title_additional %}
+    	{% if g.ln == "fr" %}
+      		{{ record.title_additional.title }}
+      		{{ record.title.title }}
+    	{% else %}
+      		{{ record.title.title }}
+        	{{ record.title_additional.title }}
+      	{% endif %}
+    {% else %}
+      	{{ record.title.title }}
+      	{#<h2 class="text-muted" id="record_detail_additional_title">{{ record.title.title }}</h2>#}
+    {% endif %}
+{% endmacro %}
+
+{% macro get_more_abstract(items_list, delimiter=";") %}
+  
+  {#<script>
+    var status = "less";
+
+    function toggleText(text)
+    {                
+      if (status == "less") 
+      {
+        document.getElementById("textArea").innerHTML=text;
+        document.getElementById("toggleButton").innerText = "(see less)";
+        status = "more";
+        } 
+        else if (status == "more") 
+        {
+          document.getElementById("textArea").innerHTML = "";
+          document.getElementById("toggleButton").innerText = "(see more)";
+          status = "less"
+        }
+      }
+  </script>#}
+
+  {% set rest = delimiter.join(items_list) %}
+  {% set safe_rest = rest|tojson|striptags %}
+       
+  <span>
+    <p id="textArea"></p>
+  </span>
+  <a id="toggleButton" onclick="toggleText({{ safe_rest }});" href="javascript:void(0);">(see more)</a>
+
+{% endmacro %}
+
+{% macro get_abstract(record, num_of_words) %}
+	{% if record['abstract'] and record['abstract']['summary'] %}
+    
+    {% set text = (record['abstract']['summary'])|split_space %}
+
+    {% if text|length > num_of_words %}
+
+      {% for word in text[0:num_of_words] %}
+        {{ word }}
+      {% endfor %}
+      {{ '...' }}
+
+      {% set abstract_list = [] %}
+      {%  do abstract_list.append('...')  %}
+      {% for word in text[num_of_words:] %}
+          {% do abstract_list.append(word) %}
+      {% endfor %}
+
+      {{get_more_abstract(abstract_list, delimiter=" ")}}
+    {% else %}
+         {% for word in text %}
+          {{ word }}
+        {% endfor %}
+    {% endif %}       
+  {% endif %}
+{% endmacro %}
+
+
+{% macro get_creation_date(record) %}
+  {% if record['creation_date'] %}
+    <i class="glyphicon glyphicon-calendar"></i>
+    {{ record.creation_date.strftime('%Y-%m-%d, %H:%M') }}
+  {% endif %}
+{% endmacro %}
+
+{% macro get_keyword(keyword, is_link=false) %}
+  {% if is_link %}
+    <span class="label label-default"><a href="http://cds.cern.ch/search?p=keyword%3A{{ keyword }}">{{keyword}}</a></span>
+  {% else %}
+    <span class="label label-default">{{keyword}}</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro get_keywords(record, limit, delimiter=";", is_link=false) %}
+    {% set keyword_list = [] %}
+    {% for keyword in record.keywords %}
+        {% do keyword_list.append(get_keyword(keyword['term'], is_link)) %}
+    {% endfor %}
+
+    {% if keyword_list != [] %}
+       <i class="glyphicon glyphicon-tag"></i>
+    {% endif %}
+
+    {{ get_see_more_list(keyword_list, limit, _("Keywords"), delimiter) }}
+
+{% endmacro %}
+
+
+{% macro get_author(author, is_link=false) %}
+    {% if is_link %}
+      <a href="http://cds.cern.ch/search?p=author%3A{{ author.full_name }}">
+>>>>>>> base: remove unused files
     {% else %}
       <span>
     {% endif %}
 
+<<<<<<< HEAD
       {{ author.full_name }} 
+=======
+      {{ author.first_name }}<span>&nbsp</span>{{ author.last_name }} 
+>>>>>>> base: remove unused files
 
     {% if is_link %}
       </a>
@@ -32,12 +279,36 @@
       </span>
     {% endif %}
 
+<<<<<<< HEAD
     {% if author.affiliation %}
       ({{ author.affiliation }})
     {% endif %}
 {% endmacro %}
 
 
+=======
+    {#{% if author.affiliation %}
+      ({{ author.affiliation }})
+    {% endif %}#}
+{% endmacro %}
+
+
+{% macro get_authors(record, limit, delimiter=";", is_link=false) %}
+    {% set authors_list = [] %}
+    {% for author in record.authors %}
+        {% do authors_list.append(get_author(author, is_link)) %}
+    {% endfor %}
+
+    {% if authors_list != [] %}
+      <i class="glyphicon glyphicon-user"></i>
+      {{'by '}}
+    {% endif %}
+
+    {{ get_see_more_list(authors_list, limit, _("Authors"), delimiter) }}
+
+{% endmacro %}
+
+>>>>>>> base: remove unused files
 {% macro get_see_more_list(items_list, limit, title, delimiter=";", page_size=20) %}
     {% if limit > items_list|length %}
         {% for item in items_list %}
@@ -45,20 +316,33 @@
         {% endfor %}
     {% else %}
         {% for item in items_list[0:limit] %}
+<<<<<<< HEAD
             {{ item }}{{ delimiter }}
+=======
+          {% if loop.index0 != limit-1 %}
+            {{ item }}{{ delimiter }} 
+          {% else %}
+            {{ item }}<span>&nbsp</span>
+          {% endif %}
+>>>>>>> base: remove unused files
         {% endfor %}
 
         <a data-show-more data-title="{{ title }}"
            data-close-button="{{ _("Close") }}"
            data-items='{{ items_list|tojson }}'
            data-page-size="{{ page_size }}">
+<<<<<<< HEAD
             {{ _("See all...") }}
+=======
+            {{ _("(see more)") }}
+>>>>>>> base: remove unused files
         </a>
 
     {% endif %}
 {% endmacro %}
 
 
+<<<<<<< HEAD
 {% macro get_authors(record, limit, delimiter=";", is_link=false, page_size=10) %}
     {% set authors_list = [] %}
     {% for author in record.authors %}
@@ -93,6 +377,24 @@
 {% macro get_creation_date(record) %}
     {{ record.creation_date.strftime('%Y-%m-%d %H:%M') }}
 {% endmacro %}
+=======
+{% macro get_copyright(record) %}
+  {% if record['coyright'] %}
+    {{ 'Copyright' }}
+    {{ record.coyright.date }}
+    {{ record.coyright.holder }}
+  {% endif %}
+{% endmacro %}
+
+
+
+{# -------------------------------------------------- #}
+{# ----------------Lukasz's macros--------------------#}
+
+
+
+
+
 
 
 {% macro get_modification_date(record) %}

@@ -41,3 +41,10 @@ js = Bundle(
         'js/main.js'
     ]
 )
+
+ivi = Bundle(
+    "js/test.js",
+    output="test.js",
+    weight=91,
+    filters="requirejs"
+)
