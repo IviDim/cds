@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02D111-1307, USA.
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """CDS bundles."""
 
@@ -35,5 +35,9 @@ js = Bundle(
     filters="requirejs",
     bower={
         "es5-shim": "latest"
-    }
+    },
+    depends=[
+        'js/cds-settings.js',
+        'js/main.js'
+    ]
 )
