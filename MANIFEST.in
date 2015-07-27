@@ -19,6 +19,8 @@
 
 include requirements*.txt AUTHORS COPYING README.md bower.json setup.cfg
 
+recursive-include cds/base/testsuite *
+
 recursive-include docs *
 recursive-exclude docs/_build *
 

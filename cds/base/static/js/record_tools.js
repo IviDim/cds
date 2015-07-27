@@ -18,64 +18,121 @@
  */
 
 define(function(require, exports, module) {
+
   var $ = require('jquery'),
     bootstrap = require('bootstrap'),
     tpl_list_modal = require('hgn!./templates/modal_list');
 
-  $("body").on("click", "a[data-show-more]", function() {
+  function modalList() {
+      $("body").on("click", "a[data-show-more]", function() {
 
-    // get json from data-items attribute
-    var raw_data_items = $(this).data('items');
-    var data_items = $.map(raw_data_items, function(e) { return ({item: e})});
+      // get json from data-items attribute
+      var raw_data_items = $(this).data('items');
+      var data_items = $.map(raw_data_items, function(e) { return ({item: e})});
 
-    var modal_id = Date.now();
+      var modal_id = Date.now();
 
-    var page_size = $(this).data('page-size');
+      var page_size = $(this).data('page-size');
 
-    var modalContext = {
-      'modal_id': modal_id,
-      'list_items': data_items,
-      'title': $(this).data('title'),
-      'close': $(this).data('close-button'),
-      'paginate': data_items.length > page_size
-    };
-    var modal_reference = "#" + modal_id;
+      var modalContext = {
+        'modal_id': modal_id,
+        'list_items': data_items,
+        'title': $(this).data('title'),
+        'close': $(this).data('close-button'),
+        'paginate': data_items.length > page_size
+      };
+      var modal_reference = "#" + modal_id;
 
-    var modal_instance = tpl_list_modal(modalContext);
-    $("body").append(modal_instance);
+      var modal_instance = tpl_list_modal(modalContext);
+      $("body").append(modal_instance);
 
-    // remove modal after it is hidden
-    $(modal_reference).modal({show: true}).on('hidden.bs.modal', function() {
-      $(modal_reference).remove();
-    });
+      // remove modal after it is hidden
+      $(modal_reference).modal({show: true}).on('hidden.bs.modal', function() {
+        $(modal_reference).remove();
+      });
 
-    // pagination
-    if (data_items.length > page_size) {
+      // pagination
+      if (data_items.length > page_size) {
 
-      var listElement = $('#pages');
+        var listElement = $('#pages');
 
-      var last_index = page_size;
-
-      listElement
-        .children().css('display', 'none')
-        .slice(0, page_size).css('display','list-item');
-
-      $('#cds-modal-expand-btn').on('click', function() {
-        if (last_index + page_size >= data_items.length) {
-          last_index = data_items.length;
-          $('#cds-modal-expand-btn').attr('disabled', true);
-        }
-        else
-          last_index = last_index + page_size;
+        var last_index = page_size;
 
         listElement
           .children().css('display', 'none')
-          .slice(0, last_index).css('display','list-item');
+          .slice(0, page_size).css('display','list-item');
 
-      });
+        $('#cds-modal-expand-btn').on('click', function() {
+          if (last_index + page_size >= data_items.length) {
+            last_index = data_items.length;
+            $('#cds-modal-expand-btn').attr('disabled', true);
+          }
+          else
+            last_index = last_index + page_size;
 
-    }
+          listElement
+            .children().css('display', 'none')
+            .slice(0, last_index).css('display','list-item');
 
-  });
+        });
 
+      }
+
+    });
+  }
+
+  function expandContent() 
+  {      
+    var showChar = 30;
+    var ellipsesText = "...";
+    var moreText = "(read more)";
+    var lessText = "(read less)";
+    
+    $('.record-brief-view-show-more').each(function() 
+    {
+      var $this = $(this);
+      var fullText = $this.text().split(" ");
+
+      if (fullText.length > showChar) {
+        var shortText = fullText.slice(0, showChar);
+        shortText.push('...');
+        shortText = shortText.join(separator=' ');
+
+       $this.data("full", fullText.join(separator=' '))
+           .stop()
+           .data("state", "shortState")
+           .stop()
+           .data("short", shortText)
+           .stop()
+           .html(shortText);
+
+         $('<a />', {
+            class: 'record-brief-view-more-link',
+            text: moreText,
+            href: '#'
+         }).appendTo($this);
+      } 
+      
+    });
+ 
+    $(".record-brief-view-more-link").on('click', function() {
+      var $link = $(this);
+      var $text = $link.closest('.record-brief-view-show-more');
+      var state = $text.data("state");
+      var linkText = (state == "shortState") ? lessText : moreText;
+      $link.text(linkText).detach();
+
+      $text.html($text.data((state == "shortState") ? "full" : "short"));
+      $text.append($link);
+
+      $text.data("state", (state == "shortState") ? "fullState" : "shortState");
+
+    });
+  };
+
+
+ return {
+    modalList: modalList,
+    expandContent: expandContent
+ }
 });

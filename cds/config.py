@@ -100,7 +100,6 @@ CFG_SITE_MISSION_INTL = {
 
 CFG_SITE_LANGS = ["en", "fr", "de", "it"]
 
-
 try:
     from cds.instance_config import *  # noqa
 except ImportError:

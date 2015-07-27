@@ -23,7 +23,7 @@
 define([
   'js/record_tools',
   'jasmine-jquery',
-], function(jasmineJQuery) {
+], function(record_tools, jasmineJQuery) {
   "use strict"
 
   describe("See more modal suite", function() {
@@ -44,7 +44,7 @@ define([
       $("#test-see-more-modal")
         .attr("data-items", data_json)
         .attr("data-page-size", page_size);
-
+        record_tools.modalList();
     });
 
     afterEach(function(){

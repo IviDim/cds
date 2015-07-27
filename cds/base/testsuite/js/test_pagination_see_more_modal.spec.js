@@ -23,7 +23,7 @@
 define([
   'js/record_tools',
   'jasmine-jquery',
-], function(jasmineJQuery) {
+], function(record_tools, jasmineJQuery) {
   "use strict"
 
   describe("See more modal pagination suite", function() {
@@ -33,7 +33,7 @@ define([
     beforeEach(function () {
       $("#test-see-more-modal").remove();
       jasmine.getFixtures().fixturesPath = '/jasmine/spec/cds.base/fixtures/';
-
+      
       var data_items = new Array(data_item_number);
 
       data_items = $.map(data_items, function(e) { return 'item' });
@@ -43,7 +43,7 @@ define([
       $("#test-see-more-modal")
         .attr("data-items", data_json)
         .attr("data-page-size", page_size);
-
+      record_tools.modalList();
     });
 
     afterEach(function(){
